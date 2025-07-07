@@ -182,7 +182,7 @@ function App() {
               <textarea
                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
                 name="requestBody"
-                onChange={handleChange("terminalId")}
+                onChange={handleChange("requestBody")}
                 rows={10}
                 cols={50}
               >
