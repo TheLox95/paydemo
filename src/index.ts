@@ -32,10 +32,10 @@ fastify.register(fastifyStatic, {
 fastify.register(fasitfyFormbody);
 
 fastify.post<{
-  Body: { terminalIp: number; terminalId: string; pairingCode: string };
+  Body: { terminalIP: number; terminalId: string; pairingCode: string };
 }>("/pairWith", (req, reply) => {
   fetch(
-    `https://${req.body.terminalIp}/POSitiveWebLink/1.0.0/pair?pairingCode=${req.body.pairingCode}&tid=${req.body.terminalId}`
+    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/pair?pairingCode=${req.body.pairingCode}&tid=${req.body.terminalId}`
   )
     .then((req) => req.json())
     .then((json) => {
@@ -47,10 +47,10 @@ fastify.post<{
 });
 
 fastify.post<{
-  Body: { terminalIp: number; terminalId: string; requestBody: string, authCode: string };
+  Body: { terminalIP: number; terminalId: string; requestBody: string, authCode: string };
 }>("/createTransaction", (req, reply) => {
   fetch(
-    `https://${req.body.terminalIp}/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}&silent=false`,
+    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}&silent=false`,
     {
       method: "POST",
       headers: {
