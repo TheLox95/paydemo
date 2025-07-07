@@ -113,6 +113,20 @@ function App() {
     [config]
   );
 
+  const requestTransactionDetails = useCallback(() => {
+    if (pairingResponse && transactionResponse) {
+      return API.transactionDetails({
+        ...config,
+        authCode: pairingResponse.authToken,
+        transactionId: transactionResponse.uti,
+      })
+        .then((res) => res.json())
+        .then((json) => {
+          setTransactionDetails(json);
+        });
+    }
+  }, [config, pairingResponse, transactionResponse]);
+
   const handleTransaction: NonNullable<
     React.HTMLProps<HTMLFormElement>["onSubmit"]
   > = useCallback(
@@ -253,7 +267,7 @@ function App() {
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200"
+              className={`w-full disabled bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200`}
             >
               Send
             </button>
@@ -272,7 +286,18 @@ function App() {
             See Details
           </h2>
           <div className="mb-6">
-    {transactionDetails ? <ReactJsonView src={transactionDetails} /> : <p>No transaction</p>}
+            {transactionDetails ? (
+              <ReactJsonView src={transactionDetails} />
+            ) : (
+              <p>No transaction</p>
+            )}
+            <button
+              onClick={requestTransactionDetails}
+              type="button"
+              className={`w-full disabled bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200`}
+            >
+              Updated details
+            </button>
           </div>
         </div>
       </main>
