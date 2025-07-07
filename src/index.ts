@@ -42,9 +42,14 @@ fastify.post<{
       },
     }
   )
-    .then((req) => req.json())
-    .then((json) => {
-      reply.send(json);
+    .then((req) => req.text())
+    .then((res) => {
+      try {
+        const json = JSON.parse(res);
+        reply.send(json);
+      } catch (e) {
+        reply.status(400).send({ error: res });
+      }
     })
     .catch((err) => {
       reply.status(400).send({ error: err.toString() });
