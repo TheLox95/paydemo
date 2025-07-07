@@ -41,7 +41,7 @@ function App() {
   });
   const [config, setConfig] = useState<BaseConfig>({
     terminalId: 1853325617,
-    terminalIP: "192.168.0.174:8080",
+    terminalIP: "192.168.0.174",
     pairingCode: "",
     requestBody: JSON.stringify(InitConfig, null, "\t"),
   });
