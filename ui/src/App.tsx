@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import ReactJsonView from "@microlink/react-json-view";
 
 type BaseConfig = {
   terminalId: number;
@@ -21,6 +22,17 @@ const API = {
   },
   transaction: (body: BaseConfig & { authCode: string }) => {
     return fetch(`${API_URL}/createTransaction`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  },
+  transactionDetails: (
+    body: BaseConfig & { authCode: string; transactionId: string }
+  ) => {
+    return fetch(`${API_URL}/transactionDetails`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -60,6 +72,17 @@ function App() {
     | undefined
   >();
 
+  const [transactionResponse, setTransactionResponse] = useState<
+    | {
+        uti: string;
+      }
+    | undefined
+  >();
+
+  const [transactionDetails, setTransactionDetails] = useState<
+    any | undefined
+  >();
+
   const handleChange = useCallback((key: keyof typeof config) => {
     return (
       e: React.ChangeEvent<HTMLInputElement> &
@@ -76,16 +99,19 @@ function App() {
 
   const handlePairing: NonNullable<
     React.HTMLProps<HTMLFormElement>["onSubmit"]
-  > = useCallback((event) => {
-    event.preventDefault(); // Prevent default form submission
-    setStatus({ lastCallSucced: undefined, message: undefined });
-    API.pair(config)
-      .then((res) => res.json())
-      .then((json) => {
-        setPairingResponse(json);
-        setStatus({ lastCallSucced: true, message: json });
-      });
-  }, [config]);
+  > = useCallback(
+    (event) => {
+      event.preventDefault(); // Prevent default form submission
+      setStatus({ lastCallSucced: undefined, message: undefined });
+      API.pair(config)
+        .then((res) => res.json())
+        .then((json) => {
+          setPairingResponse(json);
+          setStatus({ lastCallSucced: true, message: json });
+        });
+    },
+    [config]
+  );
 
   const handleTransaction: NonNullable<
     React.HTMLProps<HTMLFormElement>["onSubmit"]
@@ -97,7 +123,17 @@ function App() {
         API.transaction({ ...config, authCode: pairingResponse?.authToken })
           .then((res) => res.json())
           .then((json) => {
+            setTransactionResponse(json);
             setStatus({ lastCallSucced: true, message: json });
+            return API.transactionDetails({
+              ...config,
+              authCode: pairingResponse?.authToken,
+              transactionId: json.uti,
+            });
+          })
+          .then((res) => res.json())
+          .then((json) => {
+            setTransactionDetails(json);
           });
       }
     },
@@ -183,6 +219,14 @@ function App() {
               Pair
             </button>
           </form>
+
+          {pairingResponse?.authToken && (
+            <div className="bg-green-600 text-white p-4">
+              <p className="text-l font-bold text-center">
+                {pairingResponse?.authToken}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="bg-white p-8 rounded-lg shadow-md">
@@ -214,6 +258,22 @@ function App() {
               Send
             </button>
           </form>
+          {transactionResponse?.uti && (
+            <div className="bg-green-600 text-white p-4">
+              <p className="text-l font-bold text-center">
+                {transactionResponse?.uti}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white p-8 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-6 text-center">
+            See Details
+          </h2>
+          <div className="mb-6">
+    {transactionDetails ? <ReactJsonView src={transactionDetails} /> : <p>No transaction</p>}
+          </div>
         </div>
       </main>
 

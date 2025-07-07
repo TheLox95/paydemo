@@ -64,7 +64,7 @@ fastify.post<{
     authCode: string;
   };
 }>("/createTransaction", (req, reply) => {
-  const requestBody = JSON.parse(req.body.requestBody)
+  const requestBody = JSON.parse(req.body.requestBody);
   fetch(
     `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}&silent=false&amountTrans=${requestBody.amountTrans}&transType=${requestBody.transType}`,
     {
@@ -74,6 +74,37 @@ fastify.post<{
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestBody),
+    }
+  )
+    .then((req) => req.text())
+    .then((res) => {
+      try {
+        const json = JSON.parse(res);
+        reply.send(json);
+      } catch (e) {
+        reply.status(400).send({ error: res });
+      }
+    })
+    .catch((err) => {
+      reply.status(400).send({ error: err.toString() });
+    });
+});
+
+fastify.post<{
+  Body: {
+    terminalIP: number;
+    terminalId: string;
+    authCode: string;
+    transactionId: string;
+  };
+}>("/transactionDetails", (req, reply) => {
+  fetch(
+    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}uti=${req.body.transactionId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${req.body.authCode}`,
+        "Content-Type": "application/json",
+      },
     }
   )
     .then((req) => req.text())
