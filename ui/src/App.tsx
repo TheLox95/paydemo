@@ -85,7 +85,7 @@ function App() {
         setPairingResponse(json);
         setStatus({ lastCallSucced: true, message: json });
       });
-  }, []);
+  }, [config]);
 
   const handleTransaction: NonNullable<
     React.HTMLProps<HTMLFormElement>["onSubmit"]
