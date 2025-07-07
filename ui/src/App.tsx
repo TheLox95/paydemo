@@ -101,7 +101,7 @@ function App() {
           });
       }
     },
-    [pairingResponse]
+    [pairingResponse, config]
   );
 
   return (
