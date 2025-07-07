@@ -70,7 +70,7 @@ fastify.post<{
     {
       method: "POST",
       headers: {
-        Authorization: req.body.authCode,
+        Authorization: `Bearer ${req.body.authCode}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestBody),
