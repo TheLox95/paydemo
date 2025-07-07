@@ -64,15 +64,16 @@ fastify.post<{
     authCode: string;
   };
 }>("/createTransaction", (req, reply) => {
+  const requestBody = JSON.parse(req.body.requestBody)
   fetch(
-    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}&silent=false`,
+    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}&silent=false&amountTrans=${requestBody.amountTrans}&transType=${requestBody.transType}`,
     {
       method: "POST",
       headers: {
         Authorization: req.body.authCode,
         "Content-Type": "application/json",
       },
-      body: req.body.requestBody,
+      body: JSON.stringify(requestBody),
     }
   )
     .then((req) => req.text())
