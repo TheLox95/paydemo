@@ -72,7 +72,7 @@ fastify.post<{
         Authorization: req.body.authCode,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(req.body.requestBody),
+      body: req.body.requestBody,
     }
   )
     .then((req) => req.text())
