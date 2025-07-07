@@ -4,15 +4,15 @@ import fasitfyFormbody from "@fastify/formbody";
 import { dirname, join } from "path";
 import fastifyStatic from "@fastify/static";
 import { fileURLToPath } from "url";
-import { Agent, setGlobalDispatcher } from 'undici'
+import { Agent, setGlobalDispatcher } from "undici";
 
 const agent = new Agent({
   connect: {
-    rejectUnauthorized: false
-  }
-})
+    rejectUnauthorized: false,
+  },
+});
 
-setGlobalDispatcher(agent)
+setGlobalDispatcher(agent);
 
 const fastify = Fastify({
   logger: true,
@@ -35,7 +35,12 @@ fastify.post<{
   Body: { terminalIP: number; terminalId: string; pairingCode: string };
 }>("/pairWith", (req, reply) => {
   fetch(
-    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/pair?pairingCode=${req.body.pairingCode}&tid=${req.body.terminalId}`
+    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/pair?pairingCode=${req.body.pairingCode}&tid=${req.body.terminalId}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
   )
     .then((req) => req.json())
     .then((json) => {
@@ -47,21 +52,27 @@ fastify.post<{
 });
 
 fastify.post<{
-  Body: { terminalIP: number; terminalId: string; requestBody: string, authCode: string };
+  Body: {
+    terminalIP: number;
+    terminalId: string;
+    requestBody: string;
+    authCode: string;
+  };
 }>("/createTransaction", (req, reply) => {
   fetch(
     `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}&silent=false`,
     {
       method: "POST",
       headers: {
-        "Authorization": req.body.authCode
+        Authorization: req.body.authCode,
+        "Content-Type": "application/json",
       },
-      body: req.body.requestBody,
+      body: JSON.stringify(req.body.requestBody),
     }
   )
     .then((req) => req.json())
     .then((json) => {
-      reply.send(json)
+      reply.send(json);
     })
     .catch((err) => {
       reply.status(400).send({ error: err.toString() });
