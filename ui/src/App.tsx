@@ -16,7 +16,7 @@ const API = {
       body: JSON.stringify(body),
     });
   },
-  transaction: (body: BaseConfig) => {
+  transaction: (body: BaseConfig & { authCode: string }) => {
     return fetch(`${API_URL}/createTransaction`, {
       method: "post",
       body: JSON.stringify(body),
@@ -46,6 +46,14 @@ function App() {
     requestBody: JSON.stringify(InitConfig, null, "\t"),
   });
 
+  const [pairingResponse, setPairingResponse] = useState<
+    | {
+        serialNumber: string;
+        authToken: string;
+      }
+    | undefined
+  >();
+
   const handleChange = useCallback((key: keyof typeof config) => {
     return (
       e: React.ChangeEvent<HTMLInputElement> &
@@ -68,21 +76,27 @@ function App() {
     API.pair(config)
       .then((res) => res.json())
       .then((json) => {
+        setPairingResponse(json);
         setStatus({ lastCallSucced: true, message: json });
       });
   }, []);
 
   const handleTransaction: NonNullable<
     React.HTMLProps<HTMLFormElement>["onSubmit"]
-  > = useCallback((event) => {
-    event.preventDefault(); // Prevent default form submission
-    setStatus({ lastCallSucced: undefined, message: undefined });
-    API.transaction(config)
-      .then((res) => res.json())
-      .then((json) => {
-        setStatus({ lastCallSucced: true, message: json });
-      });
-  }, []);
+  > = useCallback(
+    (event) => {
+      event.preventDefault(); // Prevent default form submission
+      setStatus({ lastCallSucced: undefined, message: undefined });
+      if (pairingResponse) {
+        API.transaction({ ...config, authCode: pairingResponse?.authToken })
+          .then((res) => res.json())
+          .then((json) => {
+            setStatus({ lastCallSucced: true, message: json });
+          });
+      }
+    },
+    [pairingResponse]
+  );
 
   return (
     <>
@@ -91,11 +105,9 @@ function App() {
           Welcome to Our Service
         </h1>
       </header>
-      {status.message !== undefined && (
+      {status.message.error !== undefined && (
         <div className="bg-red-600 text-white p-4">
-          <p className="text-l font-bold text-center">
-            {status.message.error}
-          </p>
+          <p className="text-l font-bold text-center">{status.message.error}</p>
         </div>
       )}
 

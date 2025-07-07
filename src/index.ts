@@ -38,12 +38,15 @@ fastify.post<{
 });
 
 fastify.post<{
-  Body: { terminalIp: number; terminalId: string; requestBody: string };
+  Body: { terminalIp: number; terminalId: string; requestBody: string, authCode: string };
 }>("/createTransaction", (req, reply) => {
   fetch(
     `https://${req.body.terminalIp}:8080/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}&silent=false`,
     {
       method: "POST",
+      headers: {
+        "Authorization": req.body.authCode
+      },
       body: req.body.requestBody,
     }
   )
