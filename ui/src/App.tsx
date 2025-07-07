@@ -13,12 +13,18 @@ const API = {
   pair: (body: BaseConfig) => {
     return fetch(`${API_URL}/pairWith`, {
       method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(body),
     });
   },
   transaction: (body: BaseConfig & { authCode: string }) => {
     return fetch(`${API_URL}/createTransaction`, {
       method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(body),
     });
   },
