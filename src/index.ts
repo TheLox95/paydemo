@@ -99,7 +99,7 @@ fastify.post<{
   };
 }>("/transactionDetails", (req, reply) => {
   fetch(
-    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}uti=${req.body.transactionId}`,
+    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}&uti=${req.body.transactionId}`,
     {
       headers: {
         Authorization: `Bearer ${req.body.authCode}`,
