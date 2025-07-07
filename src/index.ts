@@ -1,9 +1,8 @@
 import Fastify from "fastify";
-import cors from '@fastify/cors'
-import fastifyView from "@fastify/view";
+import cors from "@fastify/cors";
 import fasitfyFormbody from "@fastify/formbody";
-import { Edge } from "edge.js";
 import { dirname, join } from "path";
+import fastifyStatic from "@fastify/static";
 import { fileURLToPath } from "url";
 
 const fastify = Fastify({
@@ -12,19 +11,13 @@ const fastify = Fastify({
 
 await fastify.register(cors, {
   // put your options here
-})
-
-const engine = new Edge();
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-engine.mount(join(__dirname, "..", "templates"));
-
-fastify.register(fastifyView, {
-  engine: {
-    //@ts-ignore
-    edge: engine,
-  },
+fastify.register(fastifyStatic, {
+  root: join(__dirname, "..", "ui", "dist"), // Adjust 'client/build' to your React build directory path
+  prefix: "/", // Serve static files from the root URL
 });
 
 fastify.register(fasitfyFormbody);
@@ -56,9 +49,7 @@ fastify.post<{
   )
     .then((req) => req.json())
     .then((json) => {
-      reply.view("transactionResult.edge", {
-        response: JSON.stringify(json, null, "\t"),
-      });
+      reply.send(json)
     })
     .catch((err) => {
       reply.status(400).send({ error: err.toString() });
