@@ -287,17 +287,19 @@ function App() {
           </h2>
           <div className="mb-6">
             {transactionDetails ? (
-              <ReactJsonView src={transactionDetails} />
+              <>
+                <ReactJsonView src={transactionDetails} />
+                <button
+                  onClick={requestTransactionDetails}
+                  type="button"
+                  className={`w-full disabled bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200`}
+                >
+                  Updated details
+                </button>
+              </>
             ) : (
               <p>No transaction</p>
             )}
-            <button
-              onClick={requestTransactionDetails}
-              type="button"
-              className={`w-full disabled bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition duration-200`}
-            >
-              Updated details
-            </button>
           </div>
         </div>
       </main>
