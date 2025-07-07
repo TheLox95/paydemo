@@ -4,6 +4,15 @@ import fasitfyFormbody from "@fastify/formbody";
 import { dirname, join } from "path";
 import fastifyStatic from "@fastify/static";
 import { fileURLToPath } from "url";
+import { Agent, setGlobalDispatcher } from 'undici'
+
+const agent = new Agent({
+  connect: {
+    rejectUnauthorized: false
+  }
+})
+
+setGlobalDispatcher(agent)
 
 const fastify = Fastify({
   logger: true,
