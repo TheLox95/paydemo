@@ -105,7 +105,7 @@ function App() {
           Welcome to Our Service
         </h1>
       </header>
-      {status.message.error !== undefined && (
+      {status?.message?.error !== undefined && (
         <div className="bg-red-600 text-white p-4">
           <p className="text-l font-bold text-center">{status.message.error}</p>
         </div>
