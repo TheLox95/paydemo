@@ -4,15 +4,7 @@ import fasitfyFormbody from "@fastify/formbody";
 import { dirname, join } from "path";
 import fastifyStatic from "@fastify/static";
 import { fileURLToPath } from "url";
-import { Agent, setGlobalDispatcher } from "undici";
-
-const agent = new Agent({
-  connect: {
-    rejectUnauthorized: false,
-  },
-});
-
-setGlobalDispatcher(agent);
+import { API } from "./service.js";
 
 const fastify = Fastify({
   logger: true,
@@ -34,25 +26,12 @@ fastify.register(fasitfyFormbody);
 fastify.post<{
   Body: { terminalIP: number; terminalId: string; pairingCode: string };
 }>("/pairWith", (req, reply) => {
-  fetch(
-    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/pair?pairingCode=${req.body.pairingCode}&tid=${req.body.terminalId}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  )
-    .then((req) => req.text())
-    .then((res) => {
-      try {
-        const json = JSON.parse(res);
-        reply.send(json);
-      } catch (e) {
-        reply.status(400).send({ error: res });
-      }
+  API.pairWithDevice(req.body)
+    .then((json) => {
+      reply.send(json);
     })
     .catch((err) => {
-      reply.status(400).send({ error: err.toString() });
+      reply.status(400).send({ error: err.error });
     });
 });
 
@@ -64,29 +43,12 @@ fastify.post<{
     authCode: string;
   };
 }>("/createTransaction", (req, reply) => {
-  const requestBody = JSON.parse(req.body.requestBody);
-  fetch(
-    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}&silent=false&amountTrans=${requestBody.amountTrans}&transType=${requestBody.transType}`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${req.body.authCode}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    }
-  )
-    .then((req) => req.text())
-    .then((res) => {
-      try {
-        const json = JSON.parse(res);
-        reply.send(json);
-      } catch (e) {
-        reply.status(400).send({ error: res });
-      }
+  API.createTransaction(req.body)
+    .then((json) => {
+      reply.send(json);
     })
     .catch((err) => {
-      reply.status(400).send({ error: err.toString() });
+      reply.status(400).send({ error: err.error });
     });
 });
 
@@ -98,26 +60,12 @@ fastify.post<{
     transactionId: string;
   };
 }>("/transactionDetails", (req, reply) => {
-  fetch(
-    `https://${req.body.terminalIP}/POSitiveWebLink/1.0.0/transaction?tid=${req.body.terminalId}&uti=${req.body.transactionId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${req.body.authCode}`,
-        "Content-Type": "application/json",
-      },
-    }
-  )
-    .then((req) => req.text())
-    .then((res) => {
-      try {
-        const json = JSON.parse(res);
-        reply.send(json);
-      } catch (e) {
-        reply.status(400).send({ error: res });
-      }
+  API.transactionDetails(req.body)
+    .then((json) => {
+      reply.send(json);
     })
     .catch((err) => {
-      reply.status(400).send({ error: err.toString() });
+      reply.status(400).send({ error: err.error });
     });
 });
 
